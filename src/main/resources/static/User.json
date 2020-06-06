@@ -1,0 +1,79 @@
+{
+  "code": 0,
+  "msg": "",
+  "count": 20,
+  "data": [
+    {
+      "id": "10001",
+      "username": "yezihao",
+      "password": "123456",
+      "role": "1",
+      "gender": "1",
+      "email": "319931482@qq.com",
+      "cdate": "Sun May 24 13:42: 06 CST 2020"
+    },
+    {
+      "id": "10002",
+      "username": "laowang",
+      "password": "999999",
+      "role": "1",
+      "gender": "1",
+      "email": "A319931482@qq.com",
+      "cdate": "Sun May 24 13:42: 06 CST 2020"
+    },
+    {
+      "id": "10003",
+      "username": "xiaoye",
+      "password": "666666",
+      "role": "0",
+      "gender": "0",
+      "email": "B319931482@qq.com",
+      "cdate": "Sun May 24 13:42: 06 CST 2020"
+    },
+    {
+      "id": "10004",
+      "username": "xiaoli",
+      "password": "555555",
+      "role": "0",
+      "gender": "0",
+      "email": "C319931482@qq.com",
+      "cdate": "Sun May 24 13:42: 06 CST 2020"
+    },
+    {
+      "id": "10005",
+      "username": "xiaobei",
+      "password": "444444",
+      "role": "0",
+      "gender": "0",
+      "email": "D319931482@qq.com",
+      "cdate": "Sun May 24 13:42: 06 CST 2020"
+    },
+    {
+      "id": "10006",
+      "username": "xiaolin",
+      "password": "333333",
+      "role": "0",
+      "gender": "1",
+      "email": "E319931482@qq.com",
+      "cdate": "Sun May 24 13:42: 06 CST 2020"
+    },
+    {
+      "id": "10007",
+      "username": "xiaocen",
+      "password": "222222",
+      "role": "0",
+      "gender": "1",
+      "email": "F319931482@qq.com",
+      "cdate": "Sun May 24 13:42: 06 CST 2020"
+    },
+    {
+      "id": "10008",
+      "username": "xiaoquan",
+      "password": "111111",
+      "role": "0",
+      "gender": "0",
+      "email": "G319931482@qq.com",
+      "cdate": "Sun May 24 13:42: 06 CST 2020"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+
+#header {
+    z-index: 98;
+    position: relative;
+}
+
+#logo {
+    background: url(../img/logo2.jpg) no-repeat;
+}
+
+#input .input_size {
+    width: 550px;
+    height: 80px;
+    text-align: left;
+    margin-left: 18px;
+}
+
+#input .input_style {
+    padding-left: 15px;
+    margin-top: 7px;
+}
+
+#input span {
+    color: #ff0000;
+    font-size: 12px;
+}
+
+#bt {
+    margin-top: 30px;
+}

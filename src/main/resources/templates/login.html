@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>你猜我猜不猜 - 登录</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/asserts/css/loginRegister.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/asserts/css/login.css}">
+    <style>
+        #msg {
+            color: #f00000;
+            position: absolute;
+            right: -10px;
+            margin-top: 39px;
+        }
+        #msg2 {
+            color: #f00000;
+            position: absolute;
+            right: -10px;
+            margin-top: 89px;
+        }
+        #input {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+<div id="wrapper" style="background-color: #f5f7f6">
+    <div id="header">
+        <div id="return_index">
+            <a id="return_style" th:href="@{/index}">返回首页</a>
+        </div>
+        <div id="center">
+            <div id="from">
+                <!--logo-->
+                <div id="logo"></div>
+                <!--校验登陆失败-->
+                <span th:unless="${#strings.isEmpty(msg)}" th:text="${msg}" id="msg"></span>
+                <span th:unless="${#strings.isEmpty(msg2)}" th:text="${msg2}" id="msg2"></span>
+
+                <form th:action="@{/login}" method="post">
+                    <div id="input">
+                        <div class="input_size">
+                            <input id="username" name="username" class="input_style" type="text" placeholder="账号">
+                        </div>
+
+                        <div class="input_size">
+                            <input id="password" name="password" class="input_style" type="password" placeholder="密码">
+                        </div>
+
+                        <div id="register">没有账号？
+                            <a th:href="@{/toRegister}">立即注册></a>
+                        </div>
+                        <button id="bt" type="submit">登&nbsp;&nbsp;&nbsp;&nbsp;录</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="footer">
+        <span>©2020 Guess whether I guess or not by Viho.</span>
+    </div>
+</div>
+</body>
+</html>

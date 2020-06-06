@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.thymeleaf.org/thymeleaf-extras-shiro">
+<head>
+    <title>404</title>
+    <link rel="stylesheet" th:href="@{/asserts/css/index.css}">
+    <style>
+        .error {
+            text-align: center;
+            font-size: 40px;
+        }
+    </style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="header">
+        <div id="nav">
+            <!--logo-->
+            <!--<div id="logo"></div>-->
+            <a id="logo" th:href="@{/index}"></a>
+            <div id="tool">
+                <span></span>
+                <div class="tool_style" th:id="feedback">
+                    <a th:href="@{/toFeedback}">反馈</a>
+                </div>
+                <span></span>
+                <div class="tool_style" th:id="reward">打赏</div>
+                <span></span>
+                <!--有管理员权限, 显示管理员页面按钮-->
+                <div class="tool_style" th:id="admin" shiro:hasPermission="1">
+                    <a class="tool_style" th:id="admin" th:href="@{/admin/toAdmin}">管理员页面</a>
+                </div>
+            </div>
+            <div id="user">
+                <!--登录 , 显示用户名-->
+                <div id="user_name" th:if="${session.loginUser}!=null">
+                    [[${session.loginUser}]]
+                </div>
+                <!--未登录-->
+                <div id="user_logout" th:if="${session.loginUser}==null">
+                    <a th:href="@{/toLogin}">登录</a>
+                    <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <a th:href="@{/toRegister}">注册</a>
+                </div>
+
+            </div>
+        </div>
+        <!--登录成功 , 用户菜单-->
+        <div id="user_hover" class="user" th:if="${session.loginUser}!=null">
+            <div id="user_menu" class="user_menu_border">
+                <a th:href="@{/user/toUserPage/}+${session.loginUser}" class="menu_style">基本资料</a>
+                <a class="menu_style" th:href="@{/logout}">退出登录</a>
+            </div>
+        </div>
+        <!--打赏-->
+        <div class="reward">
+            <div id="reward_menu" class="reward_menu_border"></div>
+        </div>
+        <!--404-->
+        <div id="center">
+            <div class="error">
+                未经授权无法访问此页面！
+            </div>
+        </div>
+    </div>
+</div>
+<!--菜单按钮-->
+<script th:src="@{/asserts/js/menuBtn.js}"></script>
+</body>
+</html>

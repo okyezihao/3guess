@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.thymeleaf.org/thymeleaf-extras-shiro">
+<head>
+    <title>你猜我猜不猜</title>
+    <link rel="stylesheet" th:href="@{\asserts\css\index.css}">
+    <link rel="stylesheet" th:href="@{\layui\css\layui.css}" media="all">
+    <style>
+        .tool_style {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+<div id="wrapper">
+    <div id="header">
+        <div id="nav">
+            <!--logo-->
+            <!--<div id="logo"></div>-->
+            <a id="logo" th:href="@{/index}"></a>
+            <div id="tool">
+                <span></span>
+                <div class="tool_style" th:id="feedback">
+                    <a th:href="@{/toFeedback}">反馈</a>
+                </div>
+                <span></span>
+                <div class="tool_style" th:id="reward">打赏</div>
+                <span></span>
+                <!--有管理员权限, 显示管理员页面按钮-->
+                <div class="tool_style" th:id="admin" shiro:hasPermission="1">
+                    <a class="tool_style" th:id="admin" th:href="@{/admin/toAdmin}">管理员页面</a>
+                </div>
+            </div>
+            <div id="user">
+                <!--登录 , 显示用户名-->
+                <div id="user_name" th:if="${session.loginUser}!=null">
+                    [[${session.loginUser}]]
+                </div>
+                <!--未登录-->
+                <div id="user_logout" th:if="${session.loginUser}==null">
+                    <a th:href="@{/toLogin}">登录</a>
+                    <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <a th:href="@{/toRegister}">注册</a>
+                </div>
+
+            </div>
+        </div>
+        <!--登录成功 , 用户菜单-->
+        <div id="user_hover" class="user" th:if="${session.loginUser}!=null">
+            <div id="user_menu" class="user_menu_border">
+                <a th:href="@{/user/toUserPage/}+${session.loginUser}" class="menu_style">基本资料</a>
+                <a class="menu_style" th:href="@{/logout}">退出登录</a>
+            </div>
+        </div>
+        <!--打赏-->
+        <div class="reward">
+            <div id="reward_menu" class="reward_menu_border"></div>
+        </div>
+        <!--全局搜索-->
+        <div class="layui-fixbar" id="layerDemo">
+            <a id="searchG" type="button" data-method="offset" data-type="auto"
+               class="layui-icon layui-icon-search"></a>
+        </div>
+
+        <!--轮播-->
+        <div id="center">
+            <div id="btn_choose">
+                <button id="btn_my" class="btn_style btn_click" type="button" onclick="click_btn_my()">谜语</button>
+                <button id="btn_xhy" class="btn_style btn_click" type="button" onclick="click_btn_xhy()">歇后语</button>
+                <button id="btn_cl" class="btn_style btn_click" type="button" onclick="click_btn_cl()">春联</button>
+
+                <div id="content">
+
+                    <div class="carousel">
+                        <div class="text">
+                            <!--左右移动-->
+                            <button class="btn_change_style btn_left" onclick="left()"><</button>
+                            <button class="btn_change_style btn_right" onclick="right()">></button>
+                            <!--类型-->
+                            <div id="type" class="type"></div>
+                            <!--问题-->
+                            <div id="above" class="above"></div>
+                            <!--答案-->
+                            <div id="below" class="below"></div>
+                        </div>
+                        <button class="car_btn_style" id="car_btn_low" onclick="low()">减速</button>
+                        <button class="car_btn_style" id="car_btn_play" onclick="play()">播放</button>
+                        <button class="car_btn_style" id="car_btn_high" onclick="high()">加速</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div id="footer">
+            <span>©2020 Guess whether I guess or not by Viho.</span>
+        </div>
+    </div>
+</div>
+<script th:src="@{/jquery/jquery-3.5.1.js}"></script>
+<script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+
+<!--菜单按钮-->
+<script th:src="@{/asserts/js/menuBtn.js}"></script>
+
+<!--全局搜索弹窗-->
+<script>
+    layui.use('layer', function () {
+        var $ = layui.jquery, layer = layui.layer;
+
+        //触发事件
+        var active = {
+            offset: function () {
+
+                layer.open({
+                    type: 2,
+                    id: 'layer', //防止重复弹出
+                    title: false,
+                    shadeClose: true,
+                    maxmin: true,
+                    area: ['1280px', '720px'],
+                    content: '/searchAll'
+                });
+            }
+        };
+
+        $('#searchG').on('click', function () {
+            var othis = $(this), method = othis.data('method');
+            active[method] ? active[method].call(this, othis) : '';
+        });
+
+
+    });
+</script>
+
+<!--轮播-->
+<script>
+    // 轮播功能
+    var total; //全局变量
+    var list; //guess对象数组
+    var num = 1;
+    var flag;
+    var len; //获取数组长度
+    var init1;  //正常速度轮播
+    var init2;  //减速×1轮播
+    var init3;  //减速×2轮播
+    var init4;  //加速×1轮播
+    var init5;  //加速×2轮播
+    var car_btn_play = document.getElementById("car_btn_play");
+    var car_btn_low = document.getElementById("car_btn_low");
+    var car_btn_high = document.getElementById("car_btn_high");
+
+    $.ajax({
+        url: "/carousel" // 请求接口
+        , type: "POST"
+        , dataType: "json"
+        , data: {"num": num} // 请求后台参数
+        , async: true
+        , error: function () {
+            alert('网络异常！');
+        }
+        , success: function (data) {
+            total = data.total;
+            list = data.list;
+            // console.log(data);
+        }
+    });
+
+    // 自动轮播
+    // 前端需要一个total表示总数, 还需要一个对象数组, 这个对象就是guess. list来接收
+    // list[i].question就是上面的,list[i].answer就是下面的
+    var f = function () {
+        if (list[num - 1].groupid == 1) {
+            list[num - 1].groupid = '谜语:';
+        }
+        if (list[num - 1].groupid == 2) {
+            list[num - 1].groupid = '歇后语:';
+        }
+        if (list[num - 1].groupid == 3) {
+            list[num - 1].groupid = '春联:';
+        }
+        $('#type').text((list[num - 1].groupid));
+        $('#above').text((list[num - 1].question));
+        $('#below').text((list[num - 1].answer));
+        num++;
+        return f;
+    };
+
+    // 手动轮播
+    // 左, 上一个
+    function left() {
+        len = list.length;
+        if (num < 1) {num = len;}
+        if (list[num - 1].groupid == 1) {
+            list[num - 1].groupid = '谜语:';
+        }
+        if (list[num - 1].groupid == 2) {
+            list[num - 1].groupid = '歇后语:';
+        }
+        if (list[num - 1].groupid == 3) {
+            list[num - 1].groupid = '春联:';
+        }
+        --num;
+        $('#type').text((list[num - 1].groupid));
+        $('#above').text((list[num - 1].question));
+        $('#below').text((list[num - 1].answer));
+    }
+
+    // 右, 下一个
+    function right() {
+        len = list.length;
+        if (num > len) {num = 1;}
+        if (list[num - 1].groupid == 1) {
+            list[num - 1].groupid = '谜语:';
+        }
+        if (list[num - 1].groupid == 2) {
+            list[num - 1].groupid = '歇后语:';
+        }
+        if (list[num - 1].groupid == 3) {
+            list[num - 1].groupid = '春联:';
+        }
+        $('#type').text((list[num - 1].groupid));
+        $('#above').text((list[num - 1].question));
+        $('#below').text((list[num - 1].answer));
+        num++;
+    }
+
+    //播放和暂停轮播轮播
+    function play() {
+        if (car_btn_play.textContent.match("播放")) {
+            if (car_btn_high.textContent.match("×2")) {
+                init5 = setInterval(f(), 500); //加速×2轮播
+            }
+            if (car_btn_high.textContent.match("×1")) {
+                init4 = setInterval(f(), 1000); //加速×1轮播
+            }
+            if (car_btn_low.textContent.match("×2")) {
+                init3 = setInterval(f(), 7000); //减速×2轮播
+            }
+            if (car_btn_low.textContent.match("×1")) {
+                init2 = setInterval(f(), 5000); //减速×1轮播
+            }
+            if (!car_btn_high.textContent.match("×2") && !car_btn_high.textContent.match("×1") &&
+                !car_btn_low.textContent.match("×2") && !car_btn_low.textContent.match("×1")) {
+                init1 = setInterval(f(), 3000); //正常速度轮播
+            }
+            car_btn_play.innerText = ("暂停");
+        } else {
+            clearInterval(init1);
+            clearInterval(init2);
+            clearInterval(init3);
+            clearInterval(init4);
+            clearInterval(init5);
+            car_btn_play.innerText = ("播放");
+        }
+    }
+
+    //减速轮播
+    function low() {
+        if (car_btn_low.textContent.match("×2")) {
+            init1 = setInterval(f(), 3000); //正常速度轮播
+            clearInterval(init2);
+            clearInterval(init3);
+            clearInterval(init4);
+            clearInterval(init5);
+            car_btn_low.innerText = ("减速");
+            car_btn_high.innerText = ("加速");
+        } else if (car_btn_low.textContent.match("×1")) {
+            clearInterval(init1);
+            clearInterval(init2);
+            init3 = setInterval(f(), 7000); //减速×2轮播
+            clearInterval(init4);
+            clearInterval(init5);
+            car_btn_low.innerText = ("减速×2");
+            car_btn_high.innerText = ("加速");
+        } else {
+            clearInterval(init1);
+            init2 = setInterval(f(), 5000); //减速×1轮播
+            clearInterval(init3);
+            clearInterval(init4);
+            clearInterval(init5);
+            car_btn_low.innerText = ("减速×1");
+            car_btn_high.innerText = ("加速");
+        }
+    }
+
+    //加速轮播
+    function high() {
+        if (car_btn_high.textContent.match("×2")) {
+            init1 = setInterval(f(), 3000); //正常速度轮播
+            clearInterval(init2);
+            clearInterval(init3);
+            clearInterval(init4);
+            clearInterval(init5);
+            car_btn_high.innerText = ("加速");
+            car_btn_low.innerText = ("减速");
+        } else if (car_btn_high.textContent.match("×1")) {
+            clearInterval(init1);
+            clearInterval(init2);
+            clearInterval(init3);
+            clearInterval(init4);
+            init5 = setInterval(f(), 500); //加速×2轮播
+            car_btn_high.innerText = ("加速×2");
+            car_btn_low.innerText = ("减速");
+        } else {
+            clearInterval(init1);
+            clearInterval(init2);
+            clearInterval(init3);
+            init4 = setInterval(f(), 1000); //加速×1轮播
+            clearInterval(init5);
+            car_btn_high.innerText = ("加速×1");
+            car_btn_low.innerText = ("减速");
+        }
+    }
+</script>
+
+</body>
+</html>

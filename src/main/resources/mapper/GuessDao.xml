@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.yezihao.dao.GuessDao">
+
+    <!--添加评论-->
+    <insert id="saveGuess" parameterType="cn.yezihao.entity.Guess">
+        insert into z.guess (question,answer,groupid)
+        values (#{question},#{answer},#{groupid});
+    </insert>
+
+    <!--通过id删除-->
+    <delete id="deleteGuess" parameterType="cn.yezihao.entity.Guess">
+        delete from z.guess
+        where id = #{id}
+    </delete>
+
+    <!--查询所有数据-->
+    <select id="findAllGuess" resultType="cn.yezihao.entity.Guess">
+        select *
+        from z.guess
+    </select>
+
+    <!--通过id查询评论-->
+    <select id="findGuessById" resultType="cn.yezihao.entity.Guess">
+        select *
+        from z.guess
+        where id = #{id}
+    </select>
+
+    <!--修改谜语-->
+    <update id="updateGuess" parameterType="cn.yezihao.entity.Guess">
+        update z.guess
+        set question = #{question},answer = #{answer},groupid = #{groupid}
+        where id = #{id}
+    </update>
+
+    <!--模糊查询问题与答案-->
+    <select id="selectBySearch" resultType="cn.yezihao.entity.Guess">
+        SELECT *
+        FROM z.guess
+        WHERE 1=1
+        <if test="search!='' and search!=null">
+        AND question LIKE CONCAT('%',#{search},'%')
+        OR answer LIKE CONCAT('%',#{search},'%')
+        OR id LIKE CONCAT('%',#{search},'%')
+        </if>
+    </select>
+
+    <!--模糊全局查询-->
+    <select id="selectGuess" resultType="cn.yezihao.entity.Guess">
+        SELECT *
+        FROM z.guess
+        WHERE 1=1
+        <if test="guess!='' and guess!=null">
+            AND question LIKE CONCAT('%',#{guess},'%')
+            OR answer LIKE CONCAT('%',#{guess},'%')
+            OR groupid LIKE CONCAT('%',#{guess},'%')
+        </if>
+    </select>
+
+</mapper>

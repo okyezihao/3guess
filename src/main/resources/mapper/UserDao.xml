@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.yezihao.dao.UserDao">
+
+    <!--增加用户-->
+    <insert id="addUser" parameterType="cn.yezihao.entity.User">
+        insert into z.user (username,password,role,gender,email,cdate)
+        values (#{username},#{password},#{role},#{gender},#{email},#{cdate});
+    </insert>
+
+
+    <!--通过用户名查询用户-->
+    <select id="selectUserByName" resultType="cn.yezihao.entity.User">
+        select *
+        from z.user u
+        where u.username = #{username}
+    </select>
+
+    <!--通过邮箱查询用户-->
+    <select id="selectUserByEmail" resultType="cn.yezihao.entity.User">
+        select *
+        from z.user u
+        where u.email = #{email}
+    </select>
+
+    <!--修改用户信息-->
+    <update id="updateUser" parameterType="cn.yezihao.entity.User">
+        update z.user
+        set password = #{password}
+        , role = #{role}
+        , gender = #{gender}
+        , email = #{email}
+        where id = #{id}
+    </update>
+
+    <select id="findUserById" resultType="cn.yezihao.entity.User">
+        select *
+        from z.user
+        where id = #{id}
+    </select>
+
+
+    <!--通过id删除-->
+    <delete id="deleteUser" parameterType="cn.yezihao.entity.User">
+        delete from z.user
+        where id = #{id}
+    </delete>
+
+    <!--查询所有用户-->
+    <select id="findAllUser" resultType="cn.yezihao.entity.User">
+        select *
+        from z.user
+    </select>
+
+    <!--用户名查询-->
+    <select id="selectByUsername" resultType="cn.yezihao.entity.User">
+        SELECT *
+        FROM z.user
+        WHERE username LIKE concat('%',#{username},'%')
+        <!--SELECT *-->
+        <!--FROM z.comment-->
+        <!--WHERE 1=1-->
+        <!--<if test="searchStr!='' and searchStr!=null">-->
+        <!--AND-->
+        <!--CONCAT(id,username,email,content,create_time createTime,parent_comment_id parentCommentId)-->
+        <!--LIKE CONCAT ('%',#{searchStr},'%')-->
+        <!--</if>-->
+    </select>
+
+    <!--模糊查询-->
+    <select id="selectUserBySearch" resultType="cn.yezihao.entity.User">
+        SELECT *
+        FROM z.user
+        WHERE 1=1
+        <if test="search!='' and search!=null">
+            AND username LIKE CONCAT('%',#{search},'%')
+            OR id LIKE CONCAT('%',#{search},'%')
+            OR email LIKE CONCAT('%',#{search},'%')
+            OR cdate LIKE CONCAT('%',#{search},'%')
+        </if>
+    </select>
+
+</mapper>

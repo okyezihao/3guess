@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.thymeleaf.org/thymeleaf-extras-shiro">
+<head>
+    <title>你猜我猜不猜</title>
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+    <script th:src="@{/jquery/jquery-3.5.1.js}"></script>
+    <script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+    <link rel="stylesheet" th:href="@{/asserts/css/index.css}">
+    <style>
+        .layui-form {
+            display: inline-block;
+            margin-top: 100px;
+            margin-left: 100px;
+        }
+
+        .user {
+            top: 0;
+            z-index: 999;
+            position: fixed;
+        }
+
+        #pwdError {
+            position: absolute;
+            top: 47px;
+        }
+
+        #pwd_trueError {
+            position: absolute;
+            top: 47px;
+        }
+
+        .layui-input {
+            width: 300px;
+            margin-bottom: 25px;
+        }
+
+        .layui-form-select {
+            width: 300px;
+        }
+
+        .tool_style {
+            font-size: 16px;
+        }
+
+        .reward {
+            top: 0;
+        }
+
+        #return_index {
+            margin-top: 79px;
+            margin-bottom: -85px;
+            margin-left: 50px;
+            color: #307672;
+            z-index: 9999;
+        }
+
+        #return_style {
+            color: #407672;
+            font-size: 15px;
+        }
+
+    </style>
+</head>
+<body>
+<div id="wrapper">
+    <input type="hidden" id="session-name" th:value="${session.loginUser}">
+    <input type="hidden" id="url-userName" th:value="${QUser.username}">
+    <div id="header">
+        <div id="nav">
+            <!--logo-->
+            <!--<div id="logo"></div>-->
+            <a id="logo" th:href="@{/index}"></a>
+            <div id="tool">
+                <span></span>
+                <div class="tool_style" th:id="feedback">
+                    <a th:href="@{/toFeedback}">反馈</a>
+                </div>
+                <span></span>
+                <div class="tool_style" th:id="reward">打赏</div>
+                <span></span>
+                <!--有管理员权限, 显示管理员页面按钮-->
+                <div class="tool_style" th:id="admin" shiro:hasPermission="1">
+                    <a class="tool_style" th:id="admin" th:href="@{/admin/toAdmin}">管理员页面</a>
+                </div>
+            </div>
+
+            <div id="user">
+                <div id="user_name" th:if="${session.loginUser}!=null">[[${session.loginUser}]]</div>
+                <div id="user_logout" th:if="${session.loginUser}==null">
+                    <a th:href="@{/toLogin}">登录</a>
+                    <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <a th:href="@{/toRegister}">注册</a>
+                </div>
+            </div>
+        </div>
+        <div id="user_hover" class="user" th:if="${session.loginUser}!=null">
+            <!--已经登录的用户菜单-->
+            <div id="user_menu" class="user_menu_border">
+                <a th:href="@{/user/toUserPage/}+${session.loginUser}" class="menu_style">基本资料</a>
+                <a class="menu_style" th:href="@{/logout}">退出登录</a>
+            </div>
+        </div>
+        <div class="reward">
+            <div id="reward_menu" class="reward_menu_border"></div>
+        </div>
+
+
+        <div th:if="${session.loginUser}">
+            <div id="return_index">
+                <a id="return_style" th:href="@{/index}">返回首页</a>
+            </div>
+            <!--表单-->
+            <form class="layui-form" th:action="@{/admin/updateUser}" method="post">
+
+                <input type="hidden" th:value="${QUser.id}" name="id">
+
+                <div class="layui-form-item layui-inline">
+                    <label class="layui-form-label">用户名：</label>
+                    <div class="layui-input-inline">
+                        <input type="text" th:value="${QUser.username}" id="username" name="username"
+                               class="layui-input" autocomplete="off" disabled>
+                    </div>
+                </div>
+
+                <!--密码-->
+                <div class="layui-form-item" id="input_password">
+                    <label class="layui-form-label">密码：</label>
+                    <div class="layui-input-inline">
+                        <input type="password" name="password" required lay-verify="required" placeholder="请输入密码"
+                               autocomplete="off" class="layui-input" onblur="pwdBlur()" onfocus="pwdFocus()"
+                               id="userpwd">
+                        <span id="pwdError" style="color: red"></span>
+
+                    </div>
+                </div>
+
+                <!--确认密码-->
+                <div class="layui-form-item">
+                    <label class="layui-form-label">确认密码：</label>
+                    <div class="layui-input-inline" id="input_truePassword">
+                        <input type="password" name="rpassword" required lay-verify="required" placeholder="请再次输入密码"
+                               autocomplete="off" class="layui-input" onblur="pwd_trueBlur()" onfocus="pwd_trueFocus()"
+                               id="userpwd_true">
+                        <span id="pwd_trueError" style="color: red"></span>
+                    </div>
+                </div>
+
+                <!--性别-->
+                <div class="layui-form-item">
+                    <label class="layui-form-label">性别：</label>
+                    <div class="layui-input-block">
+
+                        <select class="layui-form-select" name="gender" th:value="${QUser.gender}"
+                                th:field="${QUser.gender}">
+                            <option value="">请选择性别</option>
+                            <option th:selected="${QUser.gender==0}" value="0">男</option>
+                            <option th:selected="${QUser.gender==1}" value="1">女</option>
+                        </select>
+
+                    </div>
+                </div>
+
+                <!--邮箱-->
+                <div class="layui-form-item">
+                    <label class="layui-form-label">邮箱：</label>
+                    <div class="layui-input-block">
+                        <input type="text" th:name="email" th:value="${QUser.email}" class="layui-input"
+                               lay-verify="email" placeholder="请输入邮箱" autocomplete="off" required>
+                    </div>
+                </div>
+
+                <!--管理员-->
+                <input type="hidden" th:name="role" lay-skin="switch" autocomplete="off"
+                       th:id="checkrole" th:value="${QUser.role}" th:checked="${QUser.role}">
+
+                <!--按钮-->
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button type="submit" class="layui-btn" lay-submit lay-filter="formDemo">确认修改</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!--菜单按钮-->
+<script th:src="@{/asserts/js/menuBtn.js}"></script>
+<!--注册信息校验-->
+<script th:src="@{/asserts/js/regester.js}"></script>
+<script>
+    $(function () {
+        var userName = $("#session-name").val();
+        var tmpName = $("#url-userName").val();
+        if(userName != tmpName) {
+            $(location).attr("href","/noAuth")
+        }
+    })
+
+</script>
+
+<!--表单提交-->
+<script>
+    //Demo
+    layui.use('form', function () {
+        var form = layui.form;
+
+        //监听提交
+        form.on('submit(formDemo)', function (data) {
+            $.ajax({
+                url: '/admin/iUpdateUser'
+                , method: 'POST'
+                , data: {
+                    id: data.field.id,
+                    username: data.field.username,
+                    password: data.field.password,
+                    gender: data.field.gender,
+                    role: data.field.role,
+                    email: data.field.email
+                }
+                , dataType: 'json'
+                , success: function (msg) {
+                    if (msg == 200) {
+                        layer.closeAll('loading');
+                        layer.load(2);
+                        layer.msg("修改成功!", {icon: 6});
+                        setTimeout(function () {
+                            window.location.href ='/index';
+                        }, 500);
+                        //加载层-风格
+                    } else if (msg == 404) {
+                        layer.msg("邮箱相同，修改失败! ", {icon: 5});
+                    }
+                }
+            });
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

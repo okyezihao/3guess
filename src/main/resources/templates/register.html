@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>你猜我猜不猜 - 注册</title>
+    <link rel="stylesheet" th:href="@{/asserts/css/loginRegister.css}">
+    <link rel="stylesheet" th:href="@{/asserts/css/register.css}">
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+</head>
+<body>
+<div id="wrapper" style="background-color: #e4edd8">
+    <div id="header">
+        <div id="return_sign">
+            <a id="return_style" th:href="@{/toLogin}">返回登录</a>
+        </div>
+        <div id="center">
+            <div id="from">
+                <!--logo-->
+                <div id="logo"></div>
+                <form th:action="@{/register}" method="post" class="layui-form">
+
+                    <div id="input">
+                        <div id="input_name" class="input_size">
+                            <label for="username">用户名：</label><br>
+                            <input name="username" id="username" class="input_style" type="text"
+                                   placeholder="请输入您的用户名" autocomplete="off" lay-verify="username|require"
+                                   onblur="nameBlur()"
+                                   onfocus="nameFocus()">
+                            <span id="nameError"></span>
+                        </div>
+                        <div id="input_password" class="input_size">
+                            <label for="userpwd">密码：</label><br>
+                            <input name="password" id="userpwd" class="input_style" type="password"
+                                   placeholder="请输入您的密码" autocomplete="off" lay-verify="password|require"
+                                   onblur="pwdBlur()"
+                                   onfocus="pwdFocus()">
+                            <span id="pwdError"></span>
+                        </div>
+                        <div id="input_truePassword" class="input_size">
+                            <label for="userpwd_true">确认密码：</label><br>
+                            <input id="userpwd_true" class="input_style" type="password"
+                                   placeholder="请确认您的密码" autocomplete="off" lay-verify="require"
+                                   onblur="pwd_trueBlur()"
+                                   onfocus="pwd_trueFocus()">
+                            <span id="pwd_trueError"></span>
+                        </div>
+
+                        <div id="input_email" class="input_size">
+                            <label for="username">Email：</label><br>
+                            <input name="email" id="email" class="input_style" type="text"
+                                   placeholder="请输入您的邮箱" autocomplete="off" lay-verify="email"
+                                   onblur="emailBlur()"
+                                   onfocus="emailFocus()">
+                            <span id="emailError"></span>
+                        </div>
+
+                        <button id="bt" type="submit" lay-submit lay-filter="bt">注&nbsp;&nbsp;&nbsp;&nbsp;册</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="footer">
+        <span>©2020 Guess whether I guess or not by Viho.</span>
+    </div>
+</div>
+<!--注册信息校验-->
+<script th:src="@{/asserts/js/regester.js}"></script>
+<script th:src="@{/jquery/jquery-3.5.1.js}"></script>
+<script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+<script>
+    layui.use(['form', 'layer'], function () {
+        var form = layui.form
+            , layer = layui.layer;
+
+        // 判断用户是否存在
+        $("#username").focusout(function () {
+            $.post('/user/isExist', {
+                    username: $("#username").val()
+                },
+                function (result) {
+                    console.log(result);
+                    if (result == true) {
+                        layer.msg('用户已存在，换一个试试8！');
+                        document.getElementById("nameError").innerText = "用户已存在！";
+                    }
+
+                });
+        });
+
+        // 判断邮箱是否存在
+        $("#email").focusout(function () {
+            $.post('/user/isExistEmail', {
+                    email: $("#email").val()
+                },
+                function (result) {
+                    console.log(result);
+                    if (result == true) {
+                        layer.msg('邮箱已存在，换一个试试8！');
+                        document.getElementById("emailError").innerText = "邮箱已存在！";
+                    }
+
+                });
+        });
+
+        // 前端校验
+        form.verify({
+            username: function (value) { //value：表单的值
+                if (!new RegExp("^[a-zA-Z0-9_\u4e00-\u9fa5\\s·]+$").test(value)) {
+                    return '用户名不能有特殊字符';
+                }
+                if (/(^\_)|(\__)|(\_+$)/.test(value)) {
+                    return '用户名首尾不能出现下划线\'_\'';
+                }
+                if (/^\d+\d+\d$/.test(value)) {
+                    return '用户名不能全为数字';
+                }
+            }
+            //数组的两个值分别代表：[正则匹配、匹配不符时的提示文字]
+            , password: [
+                /^[\S]{6,12}$/
+                , '密码必须6到12位，且不能出现空格'
+            ]
+            , function() {
+                if ($('#userpwd_true').val() != $('#userpwd').val()) {
+                    return '两次密码输入不一致！';
+                }
+            }
+        });
+
+        //监听提交
+        form.on('submit(bt)', function (data) {
+            $.ajax({
+                url: '/register'
+                , method: 'POST'
+                , data: {
+                    username: data.field.username,
+                    password: data.field.password,
+                    email: data.field.email
+                }
+                , dataType: 'json'
+                , success: function (msg) {
+                    if (msg == 200) {
+                        layer.closeAll('loading');
+                        layer.load(2);
+                        layer.msg("注册成功!", {icon: 6});
+                        setTimeout(function () {
+                            window.location.href = 'index.html'
+                        }, 500);
+                        //加载层-风格
+                    } else if (msg == 404) {
+                        layer.msg("邮箱已存在！换一个试试吧！", {icon: 5});
+                    }
+                }
+            });
+            return false;
+        });
+
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.yezihao.dao.CommentDao">
+
+    <!--添加评论-->
+    <insert id="saveComment" parameterType="cn.yezihao.entity.Comment">
+        insert into z.comment (username,email,content,create_time,parent_comment_id)
+        values (#{username},#{email},#{content},#{createTime},#{parentCommentId});
+    </insert>
+
+    <!--查询父级评论-->
+    <select id="findByParentIdNull" resultType="cn.yezihao.entity.Comment">
+        select *
+        from z.comment c
+        where c.parent_comment_id = #{ParentId}
+        order by c.create_time desc
+    </select>
+
+    <!--查询一级回复-->
+    <select id="findByParentIdNotNull" resultType="cn.yezihao.entity.Comment">
+        select *
+        from z.comment c
+        where c.parent_comment_id = #{id}
+        order by c.create_time desc
+    </select>
+
+    <!--查询二级以及所有子集回复-->
+    <select id="findByReplayId" resultType="cn.yezihao.entity.Comment">
+        select *
+        from z.comment c
+        where c.parent_comment_id = #{childId}
+        order by c.create_time desc
+    </select>
+
+    <!--通过id删除-->
+    <delete id="deleteComment" parameterType="cn.yezihao.entity.Comment">
+        delete from z.comment
+        where id = #{id}
+    </delete>
+
+    <!--查询所有数据-->
+    <select id="findAllComment" resultType="cn.yezihao.entity.Comment">
+        select *
+        from z.comment
+    </select>
+
+    <!--通过id查询评论-->
+    <select id="findCommentById" resultType="cn.yezihao.entity.Comment">
+        select *
+        from z.comment c
+        where c.id = #{id}
+    </select>
+
+    <!--修改评论-->
+    <update id="updateComment" parameterType="cn.yezihao.entity.Comment">
+        update z.comment
+        set content = #{content},create_time = #{createTime},parent_comment_id = #{parentCommentId}
+        where id = #{id}
+    </update>
+
+    <!--模糊查询-->
+    <select id="selectBySearch" resultType="cn.yezihao.entity.Comment">
+        SELECT *
+        FROM z.comment
+        WHERE 1=1
+        <if test="commSearch!='' and commSearch!=null">
+            AND username LIKE CONCAT('%',#{commSearch},'%')
+            OR content LIKE CONCAT('%',#{commSearch},'%')
+            OR create_time LIKE CONCAT('%',#{commSearch},'%')
+            OR parent_comment_id LIKE CONCAT('%',#{commSearch},'%')
+            OR id LIKE CONCAT('%',#{commSearch},'%')
+            OR email LIKE CONCAT('%',#{commSearch},'%')
+        </if>
+    </select>
+
+</mapper>
