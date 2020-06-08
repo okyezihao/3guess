@@ -3,8 +3,8 @@
       xmlns:shiro="http://www.thymeleaf.org/thymeleaf-extras-shiro">
 <head>
     <title>你猜我猜不猜</title>
-    <link rel="stylesheet" th:href="@{\asserts\css\index.css}">
-    <link rel="stylesheet" th:href="@{\layui\css\layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/asserts/css/index.css}">
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
     <style>
         .tool_style {
             font-size: 16px;
@@ -99,9 +99,6 @@
 <script th:src="@{/jquery/jquery-3.5.1.js}"></script>
 <script type="text/javascript" th:src="@{/layui/layui.js}"></script>
 
-<!--菜单按钮-->
-<script th:src="@{/asserts/js/menuBtn.js}"></script>
-
 <!--全局搜索弹窗-->
 <script>
     layui.use('layer', function () {
@@ -127,7 +124,6 @@
             var othis = $(this), method = othis.data('method');
             active[method] ? active[method].call(this, othis) : '';
         });
-
 
     });
 </script>
@@ -165,6 +161,59 @@
         }
     });
 
+    // 菜单按钮
+    function click_btn_my() {
+        var content = document.getElementById("content");
+        var btn_xhy = document.getElementById("btn_xhy");
+        var btn_cl = document.getElementById("btn_cl");
+        if (content.style.display === "block") {
+            content.style.display = "none";
+            btn_xhy.style.left = "0px";
+            btn_cl.style.left = "0px";
+        } else {
+            content.style.display = "block";
+            btn_xhy.style.left = "1000px";
+            btn_cl.style.left = "1000px";
+        }
+
+    }
+
+    function click_btn_xhy() {
+        var content = document.getElementById("content");
+        var btn_my = document.getElementById("btn_my");
+        var btn_xhy = document.getElementById("btn_xhy");
+        var btn_cl = document.getElementById("btn_cl");
+        if (content.style.display === "block") {
+            content.style.display = "none";
+            btn_my.style.left = "0px";
+            btn_xhy.style.left = "0px";
+            btn_cl.style.left = "0px";
+        } else {
+            content.style.display = "block";
+            btn_my.style.left = "-1000px";
+            btn_xhy.style.left = "-265px";
+            btn_cl.style.left = "1000px";
+        }
+    }
+
+    function click_btn_cl() {
+        var content = document.getElementById("content");
+        var btn_xhy = document.getElementById("btn_xhy");
+        var btn_my = document.getElementById("btn_my");
+        var btn_cl = document.getElementById("btn_cl");
+        if (content.style.display === "block") {
+            content.style.display = "none";
+            btn_xhy.style.left = "0px";
+            btn_my.style.left = "0px";
+            btn_cl.style.left = "0px"
+        } else {
+            content.style.display = "block";
+            btn_xhy.style.left = "-1000px";
+            btn_my.style.left = "-1000px";
+            btn_cl.style.left = "-530px";
+        }
+    }
+
     // 自动轮播
     // 前端需要一个total表示总数, 还需要一个对象数组, 这个对象就是guess. list来接收
     // list[i].question就是上面的,list[i].answer就是下面的
@@ -189,7 +238,9 @@
     // 左, 上一个
     function left() {
         len = list.length;
-        if (num < 1) {num = len;}
+        if (num < 1) {
+            num = len;
+        }
         if (list[num - 1].groupid == 1) {
             list[num - 1].groupid = '谜语:';
         }
@@ -208,7 +259,9 @@
     // 右, 下一个
     function right() {
         len = list.length;
-        if (num > len) {num = 1;}
+        if (num > len) {
+            num = 1;
+        }
         if (list[num - 1].groupid == 1) {
             list[num - 1].groupid = '谜语:';
         }

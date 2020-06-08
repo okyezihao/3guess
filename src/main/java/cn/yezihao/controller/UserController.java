@@ -74,18 +74,31 @@ public class UserController {
         /*ByteSource salt = ByteSource.Util.bytes(user.getUsername());
         String md5 = new SimpleHash("md5", user.getPassword(), salt, 1024).toHex();
         user.setPassword(md5);*/
-        User user1 = userService.selectUserByEmail(user.getEmail());
+
 //        System.out.println("数据库存在邮箱=>" + user1.getEmail());
 //        System.out.println("输入邮箱=>" + user.getEmail());
+
         // 判断邮箱是否相同 , 相同修改失败
-        if (user.getEmail() != user1.getEmail() || user1.getEmail()==null) {
+        User findUserEmail = userService.selectUserByEmail(user.getEmail());
+        User findUsername = userService.selectUserByName(user.getUsername());
+
+        // 当前用户名邮箱与输入邮箱是否相同, 相同成功, 不相同判断数据库中是否存在
+        // 当前用户邮箱 与 输入邮箱 是否相同
+        if (user.getEmail().equals(findUsername.getEmail())) {
+            // 相同更新
             userService.updateUser(user);
-
-            System.out.println("admin修改用户信息=>[" + user.getUsername() + "]");
-
+            System.out.println("用户修改个人资料=>[" + user.getUsername() + "]");
             return 200;
+        } else { // 输入邮箱与当前用户邮箱 不相同
+            // 判断输入邮箱 在数据库中是否存在
+            if (findUserEmail == null) {
+                userService.updateUser(user);
+                System.out.println("用户修改个人资料=>[" + user.getUsername() + "]");
+                return 200;
+            } else {
+                return 404;
+            }
         }
-        return 404;
     }
 
     // 删除 行数据
@@ -144,16 +157,28 @@ public class UserController {
         // 判断邮箱是否相同 , 相同修改失败
         User findUserEmail = userService.selectUserByEmail(user.getEmail());
         User findUsername = userService.selectUserByName(user.getUsername());
-        if (findUsername.getEmail() != user.getEmail() || findUserEmail.getEmail() == null) {
+
+        // System.out.println("数据库存在邮箱" + findUsername.getEmail());
+        // System.out.println("输入邮箱" + user.getEmail());
+
+        // 当前用户名邮箱与输入邮箱是否相同, 相同成功, 不相同判断数据库中是否存在
+        // 当前用户邮箱 与 输入邮箱 是否相同
+        if (user.getEmail().equals(findUsername.getEmail())) {
+            // 相同更新
             userService.updateUser(user);
-
             System.out.println("用户修改个人资料=>[" + user.getUsername() + "]");
-
-//            System.out.println("数据库存在邮箱"+findUserEmail.getEmail());
-//            System.out.println("输入邮箱"+user.getEmail());
             return 200;
+        } else { // 输入邮箱与当前用户邮箱 不相同
+            // 判断输入邮箱 在数据库中是否存在
+            if (findUserEmail == null) {
+                userService.updateUser(user);
+                System.out.println("用户修改个人资料=>[" + user.getUsername() + "]");
+                return 200;
+            } else {
+                return 404;
+            }
         }
-        return 404;
+
     }
 
 }

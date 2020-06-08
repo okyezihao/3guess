@@ -111,7 +111,7 @@
                 <a id="return_style" th:href="@{/index}">返回首页</a>
             </div>
             <!--表单-->
-            <form class="layui-form" th:action="@{/admin/updateUser}" method="post">
+            <form class="layui-form" th:action="@{/admin/iUpdateUser}" method="post">
 
                 <input type="hidden" th:value="${QUser.id}" name="id">
 
@@ -186,8 +186,6 @@
     </div>
 </div>
 
-<!--菜单按钮-->
-<script th:src="@{/asserts/js/menuBtn.js}"></script>
 <!--注册信息校验-->
 <script th:src="@{/asserts/js/regester.js}"></script>
 <script>
