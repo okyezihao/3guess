@@ -1,7 +1,7 @@
 package cn.yezihao.controller;
 
 import cn.yezihao.entity.Guess;
-import cn.yezihao.service.GuessService;
+import cn.yezihao.service.impl.GuessServiceImpl;
 import cn.yezihao.util.LayuiTypeJson;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -18,7 +18,7 @@ import java.util.Map;
 public class GuessController {
 
     @Autowired
-    private GuessService guessService;
+    private GuessServiceImpl guessService;
 
     // 返回 admin谜语列表
     @GetMapping("/admin/guessList")
@@ -77,18 +77,7 @@ public class GuessController {
     @RequestMapping("/admin/delManyGuess")
     @ResponseBody
     public String delManyGuess(@RequestParam("id[]") String[] id) {
-        for (int i = 0; i < id.length; i++) {
-            String n = id[i];
-            int t = Integer.parseInt(n);
-
-            System.out.println("谜语删除,id=>[" + t + "] ");
-
-            guessService.deleteGuess(t);
-        }
-
-        System.out.println("删除谜语数组,id=>[" + JSON.toJSONString(id) + "]");
-
-        return JSON.toJSONString(id);
+        return guessService.delManyGuess(id);
     }
 
     // 谜语 模糊查询
@@ -136,12 +125,12 @@ public class GuessController {
         // 查询所有谜语
         List<Guess> allGuess = guessService.findAllGuess();
         // 万能的 map
-        Map<String,Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         // 所有谜语总数
         int total = allGuess.size();
 //        System.out.println("后端谜语数据总数=>[" + total + "]");
-        map.put("total",total);
-        map.put("list",allGuess);
+        map.put("total", total);
+        map.put("list", allGuess);
         return map;
     }
 

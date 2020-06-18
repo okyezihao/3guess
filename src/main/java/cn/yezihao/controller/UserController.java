@@ -2,6 +2,7 @@ package cn.yezihao.controller;
 
 import cn.yezihao.entity.User;
 import cn.yezihao.service.UserService;
+import cn.yezihao.service.impl.UserServiceImpl;
 import cn.yezihao.util.LayuiTypeJson;
 import com.alibaba.fastjson.JSON;
 import org.apache.shiro.crypto.hash.SimpleHash;
@@ -17,7 +18,7 @@ import java.util.List;
 public class UserController {
 
     @Autowired
-    UserService userService;
+    UserServiceImpl userService;
 
     // 返回 admin 用户列表
     @GetMapping("/admin/userList")
@@ -40,22 +41,7 @@ public class UserController {
     @PostMapping("/admin/addUser")
     @ResponseBody
     public int addUser(User user) {
-        // 将密码进行MD5 加盐加密
-        ByteSource salt = ByteSource.Util.bytes(user.getUsername());
-        // 转为密文 ( 加密方式 , 明文密码 , 盐值 , 迭代次数 )
-        String md5 = new SimpleHash("md5", user.getPassword(), salt, 1024).toHex();
-        user.setPassword(md5);
-        // 判断数据库中是否存在相同用户名 , 相同邮箱
-        if (userService.selectUserByName(user.getUsername()) == null
-                && userService.selectUserByEmail(user.getEmail()) == null) {
-
-            System.out.println("admin新增用户信息=>[" + user + "]");
-
-            // 保存到数据库中
-            userService.addUser(user);
-            return 200;
-        }
-        return 404;
+        return userService.adminAddUser(user);
     }
 
     // 弹出层 跳转 用户修改表单
@@ -70,35 +56,7 @@ public class UserController {
     @PostMapping("/admin/updateUser")
     @ResponseBody
     public int updateUser(User user) {
-        // 修改密码后再加密
-        /*ByteSource salt = ByteSource.Util.bytes(user.getUsername());
-        String md5 = new SimpleHash("md5", user.getPassword(), salt, 1024).toHex();
-        user.setPassword(md5);*/
-
-//        System.out.println("数据库存在邮箱=>" + user1.getEmail());
-//        System.out.println("输入邮箱=>" + user.getEmail());
-
-        // 判断邮箱是否相同 , 相同修改失败
-        User findUserEmail = userService.selectUserByEmail(user.getEmail());
-        User findUsername = userService.selectUserByName(user.getUsername());
-
-        // 当前用户名邮箱与输入邮箱是否相同, 相同成功, 不相同判断数据库中是否存在
-        // 当前用户邮箱 与 输入邮箱 是否相同
-        if (user.getEmail().equals(findUsername.getEmail())) {
-            // 相同更新
-            userService.updateUser(user);
-            System.out.println("用户修改个人资料=>[" + user.getUsername() + "]");
-            return 200;
-        } else { // 输入邮箱与当前用户邮箱 不相同
-            // 判断输入邮箱 在数据库中是否存在
-            if (findUserEmail == null) {
-                userService.updateUser(user);
-                System.out.println("用户修改个人资料=>[" + user.getUsername() + "]");
-                return 200;
-            } else {
-                return 404;
-            }
-        }
+        return userService.adminUpdateUser(user);
     }
 
     // 删除 行数据
@@ -150,35 +108,7 @@ public class UserController {
     @PostMapping("/admin/iUpdateUser")
     @ResponseBody
     public int iUpdateUser(User user) {
-        // 修改密码后再加密
-        ByteSource salt = ByteSource.Util.bytes(user.getUsername());
-        String md5 = new SimpleHash("md5", user.getPassword(), salt, 1024).toHex();
-        user.setPassword(md5);
-        // 判断邮箱是否相同 , 相同修改失败
-        User findUserEmail = userService.selectUserByEmail(user.getEmail());
-        User findUsername = userService.selectUserByName(user.getUsername());
-
-        // System.out.println("数据库存在邮箱" + findUsername.getEmail());
-        // System.out.println("输入邮箱" + user.getEmail());
-
-        // 当前用户名邮箱与输入邮箱是否相同, 相同成功, 不相同判断数据库中是否存在
-        // 当前用户邮箱 与 输入邮箱 是否相同
-        if (user.getEmail().equals(findUsername.getEmail())) {
-            // 相同更新
-            userService.updateUser(user);
-            System.out.println("用户修改个人资料=>[" + user.getUsername() + "]");
-            return 200;
-        } else { // 输入邮箱与当前用户邮箱 不相同
-            // 判断输入邮箱 在数据库中是否存在
-            if (findUserEmail == null) {
-                userService.updateUser(user);
-                System.out.println("用户修改个人资料=>[" + user.getUsername() + "]");
-                return 200;
-            } else {
-                return 404;
-            }
-        }
-
+        return userService.iUpdateUser(user);
     }
 
 }
